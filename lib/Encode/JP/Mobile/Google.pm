@@ -11,15 +11,15 @@ sub needs_lines { 1 }
 $Encode::Encoding{"x-utf8-e4u-mobile-google"} = bless { Name => "x-utf8-e4u-mobile-google" }, __PACKAGE__;
 
 sub encode($$;$) {
-    my ($self, $str, $char, $check) = @_;
+    my ($self, $char, $check) = @_;
     my ($encoder, $decoder);
     if ($char =~/\p{InSoftBankPictograms}/) {
-        $encoder = 'x-sjis-softbank';
+        $encoder = 'x-sjis-softbank-auto';
         $decoder = 'x-sjis-e4u-softbank3g';
     } elsif ($char =~/\p{InKDDIAutoPictograms}/) {
         $encoder = 'x-sjis-kddi-auto';
-        $decoder = 'x-utf8-e4u-kddiweb';
-    } elsif ($char =~/\p{InDocomoPictograms}/) {
+        $decoder = 'x-sjis-e4u-kddiweb';
+    } elsif ($char =~/\p{InDoCoMoPictograms}/) {
         $encoder = 'x-sjis-docomo';
         $decoder = 'x-sjis-e4u-docomo';
     } else {
@@ -33,7 +33,7 @@ sub encode($$;$) {
 sub decode($$;$) {
     my ($self, $char, $check) = @_; 
  
-    return Encode::decode('x-sjis-softbank', Encode::encode('x-sjis-e4u-softbank3g',Encode::decode('x-utf8-e4u-google', $char)));
+    return Encode::decode('x-sjis-softbank-auto', Encode::encode('x-sjis-e4u-softbank3g',Encode::decode('x-utf8-e4u-google', $char)));
 }
 
 
