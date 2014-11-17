@@ -33,7 +33,11 @@ sub encode($$;$) {
 sub decode($$;$) {
     my ($self, $char, $check) = @_; 
  
-    return Encode::decode('x-sjis-softbank-auto', Encode::encode('x-sjis-e4u-softbank3g',Encode::decode('x-utf8-e4u-google', $char)));
+    my $res = Encode::decode('x-sjis-softbank-auto', Encode::encode('x-sjis-e4u-softbank3g',Encode::decode('x-utf8-e4u-google', $char)));
+    if ($Encode::JP::Mobile::E4U::REPLACE_4BYTE_UTF8_CHARS) {
+        $res =~s/[\x{10000}-\x{3ffff}\x{40000}-\x{fffff}\x{100000}-\x{10ffff}]/\x{3013}/g;
+    }
+    return $res;
 }
 
 
