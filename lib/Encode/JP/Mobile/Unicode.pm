@@ -9,29 +9,16 @@ use Encode ();
 sub needs_lines { 1 }
 $Encode::Encoding{"x-utf8-e4u-mobile-unicode"} = bless { Name => "x-utf8-e4u-mobile-unicode" }, __PACKAGE__;
 
+my $fb_callback = Encode::JP::Mobile::FB_CHARACTER(sub { chr(shift);});
+
 sub encode($$;$) {
     my ($self, $char, $check) = @_;
-    my ($encoder, $decoder);
-    if ($char =~/\p{InSoftBankPictograms}/) {
-        $encoder = 'x-sjis-softbank-auto';
-        $decoder = 'x-sjis-e4u-softbank3g';
-    } elsif ($char =~/\p{InKDDIAutoPictograms}/) {
-        $encoder = 'x-sjis-kddi-auto';
-        $decoder = 'x-sjis-e4u-kddiweb';
-    } elsif ($char =~/\p{InDoCoMoPictograms}/) {
-        $encoder = 'x-sjis-docomo';
-        $decoder = 'x-sjis-e4u-docomo';
-    } else {
-        $encoder = 'utf8';
-        $decoder = 'utf8';
-    }
-    my $decoded_as_unicode = Encode::decode($decoder, Encode::encode($encoder, $char));
-    return Encode::encode('x-utf8-e4u-unicode', $decoded_as_unicode);
+    Encode::encode('x-utf8-e4u-unicode', Encode::decode('x-utf8-e4u-softbank3g', Encode::encode("x-utf8-softbank", $char, $fb_callback)), $fb_callback);
 }
 
 sub decode($$;$) {
     my ($self, $char, $check) = @_;
-    my $res = Encode::decode('x-sjis-softbank-auto', Encode::encode('x-sjis-e4u-softbank3g', Encode::decode('x-utf8-e4u-unicode', $char)));
+    my $res = Encode::decode('utf8', Encode::encode('x-utf8-e4u-softbank3g', Encode::decode('x-utf8-e4u-unicode', $char)));
     if ($Encode::JP::Mobile::E4U::REPLACE_4BYTE_UTF8_CHARS) {
         $res =~s/[\x{10000}-\x{3ffff}\x{40000}-\x{fffff}\x{100000}-\x{10ffff}]/\x{3013}/g;
     }
