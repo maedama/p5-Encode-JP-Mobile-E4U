@@ -13,12 +13,13 @@ my $fb_callback = Encode::JP::Mobile::FB_CHARACTER(sub { chr(shift);});
 
 sub encode($$;$) {
     my ($self, $char, $check) = @_;
-    Encode::encode('x-utf8-e4u-unicode', Encode::decode('x-utf8-e4u-softbank3g', Encode::encode("x-utf8-softbank", $char, $fb_callback)), $fb_callback);
+    
+    Encode::encode('x-utf8-e4u-unicode', Encode::decode('x-utf8-e4u-mixed', Encode::encode("utf8", $char, $fb_callback)), $fb_callback);
 }
 
 sub decode($$;$) {
     my ($self, $char, $check) = @_;
-    my $res = Encode::decode('utf8', Encode::encode('x-utf8-e4u-softbank3g', Encode::decode('x-utf8-e4u-unicode', $char)));
+    my $res = Encode::decode('utf8', Encode::encode('x-utf8-e4u-mixed', Encode::decode('x-utf8-e4u-unicode', $char)));
     if ($Encode::JP::Mobile::E4U::REPLACE_4BYTE_UTF8_CHARS) {
         $res =~s/[\x{10000}-\x{3ffff}\x{40000}-\x{fffff}\x{100000}-\x{10ffff}]/\x{3013}/g;
     }
